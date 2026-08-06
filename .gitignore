@@ -1,0 +1,14 @@
+Debug/
+Release/
+*.o
+*.d
+*.list
+*.map
+*.elf
+*.bin
+*.hex
+
+# IDE metadata
+.metadata/
+.settings/org.eclipse.core.resources.prefs
+*.launch
