@@ -21,6 +21,7 @@ extern osMessageQueueId_t imu_queue;
 extern osMessageQueueId_t attitude_queue;
 extern osSemaphoreId_t button_sem;
 extern volatile uint8_t logging_enabled;
+extern osMessageQueueId_t baro_queue;
 
 #endif /* APP_GLOBALS_H */
 //

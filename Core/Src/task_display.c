@@ -23,21 +23,37 @@ void task_display(void *argument)
     ssd1306_Init();
     osMutexRelease(i2c_mutex);
 
-    Attitude_t att;
+    Attitude_t att = {0.0f, 0.0f};
+    BarData_t baro = {0.0f, 0.0f};
     char buf[32];
 
     for (;;)
     {
+    	osMessageQueueGet(baro_queue, &baro, NULL, 0);
+
         if (osMessageQueueGet(attitude_queue, &att, NULL, osWaitForever) == osOK)
         {
             osMutexAcquire(i2c_mutex, osWaitForever);
-            ssd1306_Fill(Black);
+            ssd1306_Fill(White);
             ssd1306_SetCursor(0, 0);
             snprintf(buf, sizeof(buf), "Roll:  %.1f deg", att.roll);
             ssd1306_WriteString(buf, Font_7x10, White);
+
+
             ssd1306_SetCursor(0, 16);
             snprintf(buf, sizeof(buf), "Pitch: %.1f deg", att.pitch);
             ssd1306_WriteString(buf, Font_7x10, White);
+
+
+            ssd1306_SetCursor(0, 32);
+            snprintf(buf, sizeof(buf), "Alt: %.1fm", baro.altitude);
+            ssd1306_WriteString(buf, Font_7x10, White);
+
+
+            ssd1306_SetCursor(0, 48);
+            snprintf(buf, sizeof(buf), "Tmp: %.1fC", baro.temperature);
+            ssd1306_WriteString(buf, Font_7x10, White);
+
             ssd1306_UpdateScreen();
             osMutexRelease(i2c_mutex);
         }

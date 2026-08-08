@@ -34,6 +34,7 @@
 #include "task_display.h"
 #include "task_log.h"
 #include "task_watchdog.h"
+#include "task_baro.h"
 //void task_sensor(void *argument);
 ////void task_print(void *argument);
 //void task_display(void *argument);
@@ -65,6 +66,7 @@ osMessageQueueId_t imu_queue;
 osMessageQueueId_t attitude_queue;
 osSemaphoreId_t button_sem;
 volatile uint8_t logging_enabled;
+osMessageQueueId_t baro_queue;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -113,6 +115,12 @@ const osThreadAttr_t filter_task_attributes = {
     .stack_size = 512 * 4,
     .priority = (osPriority_t) osPriorityAboveNormal,
 };
+
+const osThreadAttr_t baro_task_attributes = {
+    .name = "baro",
+    .stack_size = 256 * 4,
+    .priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -148,6 +156,7 @@ void MX_FREERTOS_Init(void) {
   /* add queues, ... */
 	imu_queue = osMessageQueueNew(10, sizeof(IMUData_t), NULL);
 	attitude_queue = osMessageQueueNew(10, sizeof(Attitude_t), NULL);
+	baro_queue = osMessageQueueNew(5, sizeof(BarData_t), NULL);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -163,6 +172,7 @@ void MX_FREERTOS_Init(void) {
   osThreadNew(task_log, NULL, &log_task_attributes);
   osThreadNew(task_watchdog, NULL, &watchdog_task_attributes);
   osThreadNew(task_filter, NULL, &filter_task_attributes);
+  osThreadNew(task_baro, NULL, &baro_task_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
