@@ -49,6 +49,23 @@ typedef struct {
 	int16_t dig_P8;
 	int16_t dig_P9;
 } BMP280Calib_t;
+
+typedef struct {
+	float roll;
+	float pitch;
+	float gyro_x;
+	float gyro_y;
+	float gyro_z;
+	float bias_x;
+	float bias_y;
+}FlightState_t;
+
+typedef struct {
+    float m1;
+    float m2;
+    float m3;
+    float m4;
+} MotorOutput_t;
 #endif /* APP_TYPES_H */
 //
 //#endif /* INC_APP_TYPES_H_ */

@@ -39,6 +39,7 @@
 #include "task_display.h"
 #include "task_log.h"
 #include "task_watchdog.h"
+#include "task_control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

@@ -35,6 +35,7 @@
 #include "task_log.h"
 #include "task_watchdog.h"
 #include "task_baro.h"
+#include "task_control.h"
 //void task_sensor(void *argument);
 ////void task_print(void *argument);
 //void task_display(void *argument);
@@ -63,7 +64,7 @@
 osMutexId_t uart_mutex;
 osMutexId_t i2c_mutex;
 osMessageQueueId_t imu_queue;
-osMessageQueueId_t attitude_queue;
+osMessageQueueId_t state_queue;
 osSemaphoreId_t button_sem;
 volatile uint8_t logging_enabled;
 osMessageQueueId_t baro_queue;
@@ -121,6 +122,12 @@ const osThreadAttr_t baro_task_attributes = {
     .stack_size = 256 * 4,
     .priority = (osPriority_t) osPriorityNormal,
 };
+
+const osThreadAttr_t control_task_attributes = {
+    .name = "control",
+    .stack_size = 256 * 4,
+    .priority = (osPriority_t) osPriorityAboveNormal,
+};
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -155,7 +162,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
 	imu_queue = osMessageQueueNew(10, sizeof(IMUData_t), NULL);
-	attitude_queue = osMessageQueueNew(10, sizeof(Attitude_t), NULL);
+	state_queue = osMessageQueueNew(10, sizeof(FlightState_t), NULL);
 	baro_queue = osMessageQueueNew(5, sizeof(BarData_t), NULL);
   /* USER CODE END RTOS_QUEUES */
 
@@ -173,6 +180,7 @@ void MX_FREERTOS_Init(void) {
   osThreadNew(task_watchdog, NULL, &watchdog_task_attributes);
   osThreadNew(task_filter, NULL, &filter_task_attributes);
   osThreadNew(task_baro, NULL, &baro_task_attributes);
+  osThreadNew(task_control, NULL, &control_task_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */

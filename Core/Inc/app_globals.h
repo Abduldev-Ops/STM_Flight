@@ -18,7 +18,7 @@
 extern osMutexId_t uart_mutex;
 extern osMutexId_t i2c_mutex;
 extern osMessageQueueId_t imu_queue;
-extern osMessageQueueId_t attitude_queue;
+extern osMessageQueueId_t state_queue;
 extern osSemaphoreId_t button_sem;
 extern volatile uint8_t logging_enabled;
 extern osMessageQueueId_t baro_queue;

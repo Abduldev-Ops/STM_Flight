@@ -14,13 +14,15 @@
 
 void task_filter(void *argument)
 {
-    while (imu_queue == NULL || attitude_queue == NULL) osDelay(1);
+    while (imu_queue == NULL || state_queue == NULL) osDelay(1);
 
     IMUData_t imu;
-    Attitude_t att = {0.0f, 0.0f};
+    FlightState_t state = {0};
 
     const float ACCEL_SCALE = 16384.0f;
     const float GYRO_SCALE  = 131.0f;
+    const float RAD_TO_DEG  = 180.0f / 3.14159f;
+    const float DEG_TO_RAD  = 3.14159f / 180.0f;
     const float dt           = 0.01f;
 
     EKF_t ekf;
@@ -34,19 +36,28 @@ void task_filter(void *argument)
             float ax = imu.accel_x / ACCEL_SCALE;
             float ay = imu.accel_y / ACCEL_SCALE;
             float az = imu.accel_z / ACCEL_SCALE;
-            float gx = imu.gyro_x  / GYRO_SCALE * 3.14159f / 180.0f;
-            float gy = imu.gyro_y  / GYRO_SCALE * 3.14159f / 180.0f;
+            float gx_dps = imu.gyro_x  / GYRO_SCALE;
+            float gy_dps = imu.gyro_y  / GYRO_SCALE;
+            float gz_dps = imu.gyro_z  / GYRO_SCALE;
 
-            float roll_accel  = atan2f(ay, az);
-            float pitch_accel = atan2f(-ax, sqrtf(ay*ay + az*az));
+            float gx_rps = gx_dps * DEG_TO_RAD;
+            float gy_rps = gy_dps * DEG_TO_RAD;
 
-            EKF_Predict(&ekf, gx, gy, dt);
-            EKF_Update(&ekf, roll_accel, pitch_accel);
+            float roll_meas  = atan2f(ay, az);
+            float pitch_meas = atan2f(-ax, sqrtf(ay*ay + az*az));
 
-            att.roll  = ekf.x[0] * 180.0f / 3.14159f;
-            att.pitch = ekf.x[1] * 180.0f / 3.14159f;
+            EKF_Predict(&ekf, gx_rps, gy_rps, dt);
+            EKF_Update(&ekf, roll_meas, pitch_meas);
 
-            osMessageQueuePut(attitude_queue, &att, 0, 0);
+            state.roll = ekf.x[0] * RAD_TO_DEG;
+            state.pitch = ekf.x[1] * RAD_TO_DEG;
+            state.gyro_x = gx_dps;
+            state.gyro_y = gy_dps;
+            state.gyro_z = gz_dps;
+            state.bias_x = ekf.x[2] * RAD_TO_DEG;
+            state.bias_y = ekf.x[3] * RAD_TO_DEG;
+
+            osMessageQueuePut(state_queue, &state, 0, 0);
         }
     }
 }

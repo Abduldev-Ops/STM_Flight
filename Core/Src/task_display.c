@@ -16,14 +16,14 @@
 
 void task_display(void *argument)
 {
-    while (uart_mutex == NULL || i2c_mutex == NULL || attitude_queue == NULL)
+    while (uart_mutex == NULL || i2c_mutex == NULL || state_queue == NULL)
         osDelay(1);
 
     osMutexAcquire(i2c_mutex, osWaitForever);
     ssd1306_Init();
     osMutexRelease(i2c_mutex);
 
-    Attitude_t att = {0.0f, 0.0f};
+    FlightState_t state = {0};
     BarData_t baro = {0.0f, 0.0f};
     char buf[32];
 
@@ -31,17 +31,17 @@ void task_display(void *argument)
     {
     	osMessageQueueGet(baro_queue, &baro, NULL, 0);
 
-        if (osMessageQueueGet(attitude_queue, &att, NULL, osWaitForever) == osOK)
+        if (osMessageQueueGet(state_queue, &state, NULL, osWaitForever) == osOK)
         {
             osMutexAcquire(i2c_mutex, osWaitForever);
-            ssd1306_Fill(White);
+            ssd1306_Fill(Black);
             ssd1306_SetCursor(0, 0);
-            snprintf(buf, sizeof(buf), "Roll:  %.1f deg", att.roll);
+            snprintf(buf, sizeof(buf), "Roll:  %.1f deg", state.roll);
             ssd1306_WriteString(buf, Font_7x10, White);
 
 
             ssd1306_SetCursor(0, 16);
-            snprintf(buf, sizeof(buf), "Pitch: %.1f deg", att.pitch);
+            snprintf(buf, sizeof(buf), "Pitch: %.1f deg", state.pitch);
             ssd1306_WriteString(buf, Font_7x10, White);
 
 
