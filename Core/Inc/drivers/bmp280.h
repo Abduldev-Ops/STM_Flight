@@ -20,8 +20,6 @@
 #define BMP280_REG_DATA 0XF7
 
 HAL_StatusTypeDef BMP280_Init(I2C_HandleTypeDef *hi2c, BMP280Calib_t *calib);
-HAL_StatusTypeDef BMP280_Read(I2C_HandleTypeDef *hi2c,
-                               BMP280Calib_t *calib,
-                               BarData_t *out);
+HAL_StatusTypeDef BMP280_Read(I2C_HandleTypeDef *hi2c, BMP280Calib_t *calib, BarData_t *out);
 
 #endif /* INC_DRIVERS_BMP280_H_ */

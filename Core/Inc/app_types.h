@@ -35,8 +35,8 @@ typedef struct {
 typedef struct {
 	//temp compensation
 	uint16_t dig_T1;
-	uint16_t dig_T2;
-	uint16_t dig_T3;
+	int16_t dig_T2;
+	int16_t dig_T3;
 
 	//press compensation
 	uint16_t dig_P1;
@@ -66,6 +66,16 @@ typedef struct {
     float m3;
     float m4;
 } MotorOutput_t;
+
+typedef struct{
+	float latitude;
+	float longitude;
+	float altitude;
+	float speed;
+	uint8_t fix;
+	uint8_t satellites;
+	uint8_t valid;
+} GPSData_t;
 #endif /* APP_TYPES_H */
 //
 //#endif /* INC_APP_TYPES_H_ */

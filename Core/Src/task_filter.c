@@ -58,6 +58,7 @@ void task_filter(void *argument)
             state.bias_y = ekf.x[3] * RAD_TO_DEG;
 
             osMessageQueuePut(state_queue, &state, 0, 0);
+            osMessageQueuePut(control_state_queue, &state, 0, 0);
         }
     }
 }

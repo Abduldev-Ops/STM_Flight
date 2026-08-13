@@ -20,10 +20,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
-#include "app_globals.h"
 
 /* USER CODE BEGIN 0 */
 #include <stdbool.h>
+#include "app_globals.h"
+
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/

@@ -31,7 +31,7 @@ void task_control(void *argument)
 	FlightState_t state;
 
 	for (;;){
-		if (osMessageQueueGet(state_queue, &state, NULL, osWaitForever) == osOK)
+		if (osMessageQueueGet(control_state_queue, &state, NULL, osWaitForever) == osOK)
 		{
 			float gyro_x_corrected = state.gyro_x - state.bias_x;
 			float gyro_y_corrected = state.gyro_y - state.bias_y;

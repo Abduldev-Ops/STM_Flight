@@ -40,6 +40,8 @@
 #include "task_log.h"
 #include "task_watchdog.h"
 #include "task_control.h"
+#include "task_gps.h"
+#include "task_baro.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,12 +70,15 @@ void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
-//void  task_sensor(void *argument);
-////void task_print(void *argument);
-//void task_display(void *argument);
-//void task_log(void *argument);
-//void task_watchdog(void *argument);
-//void task_filter(void *argument);
+void  task_sensor(void *argument);
+//void task_print(void *argument);
+void task_display(void *argument);
+void task_log(void *argument);
+void task_watchdog(void *argument);
+void task_filter(void *argument);
+void task_baro(void *argument);
+void task_gps(void *argument);
+void task_control(void *argument);
 //void task_blink_fast(void *argument);
 //void task_blink_slow(void *argument);
 /* USER CODE END PFP */
@@ -122,6 +127,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_IWDG_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   printf("Booting...\r\n");
   /* USER CODE END 2 */
