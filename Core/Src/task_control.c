@@ -29,7 +29,7 @@ void task_control(void *argument)
 	PID_Init(&pid_pitch_angle, 2.0f, 0.0f, 0.0f, 50.0, 200.0);
 
 	const float dt= 0.01f;
-	const float THROTTLE = 50.0f;
+	//const float THROTTLE = 50.0f;
 	FlightState_t state;
 
 
@@ -46,23 +46,34 @@ void task_control(void *argument)
 			float pitch_out = PID_Update(&pid_pitchrate, pitch_rate_setpoint, gyro_y_corrected, dt);
 			float yaw_out = PID_Update(&pid_yawrate, 0, state.gyro_z, dt);
 
-			float m1= THROTTLE + pitch_out - roll_out - yaw_out;
-			float m2= THROTTLE - pitch_out + roll_out - yaw_out;
-			float m3= THROTTLE + pitch_out + roll_out + yaw_out;
-			float m4= THROTTLE - pitch_out - roll_out + yaw_out;
 
-			if (m1 < 0.0f) m1 = 0.0f;
-			if (m1 > 100.0f) m1 = 100.0f;
-			if (m2 < 0.0f) m2 = 0.0f;
-			if (m2 > 100.0f) m2 = 100.0f;
-			if (m3 < 0.0f) m3 = 0.0f;
-			if (m3 > 100.0f) m3 = 100.0f;
-			if (m4 < 0.0f) m4 = 0.0f;
-			if (m4 > 100.0f) m4 = 100.0f;
+			float base = armed ? throttle : 0.0f;
 
+			float m1= base + pitch_out - roll_out - yaw_out;
+			float m2= base - pitch_out + roll_out - yaw_out;
+			float m3= base + pitch_out + roll_out + yaw_out;
+			float m4= base - pitch_out - roll_out + yaw_out;
+
+			if (!armed)
+			{
+				m1 = 0.0f;
+				m2 = 0.0f;
+				m3 = 0.0f;
+				m4 = 0.0f;
+			} else {
+				if (m1 < 0.0f) m1 = 0.0f;
+				if (m1 > 100.0f) m1 = 100.0f;
+				if (m2 < 0.0f) m2 = 0.0f;
+				if (m2 > 100.0f) m2 = 100.0f;
+				if (m3 < 0.0f) m3 = 0.0f;
+				if (m3 > 100.0f) m3 = 100.0f;
+				if (m4 < 0.0f) m4 = 0.0f;
+				if (m4 > 100.0f) m4 = 100.0f;
+			}
 			if (logging_enabled){
 				osMutexAcquire(uart_mutex, osWaitForever);
-				printf("RS: %.1f PS: %.1f M1:%.0f M2:%.0f M3:%.0f M4:%.0f\r\n", roll_rate_setpoint, pitch_rate_setpoint,m1, m2, m3, m4);
+				printf("[%s] T:%.0f RS:%.1f PS:%.1f M1:%.0f M2:%.0f M3:%.0f M4:%.0f\r\n", armed ? "ARM" : "DIS", throttle,
+				       roll_rate_setpoint, pitch_rate_setpoint, m1, m2, m3, m4);
 				osMutexRelease(uart_mutex);
 			}
 		}

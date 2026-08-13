@@ -74,6 +74,8 @@ osSemaphoreId_t button_sem;
 volatile uint8_t logging_enabled;
 osMessageQueueId_t baro_queue;
 osMessageQueueId_t gps_queue;
+volatile uint8_t armed = 0;
+volatile float throttle = 0.0f;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */

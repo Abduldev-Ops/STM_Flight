@@ -24,6 +24,8 @@ extern osSemaphoreId_t button_sem;
 extern volatile uint8_t logging_enabled;
 extern osMessageQueueId_t baro_queue;
 extern osMessageQueueId_t gps_queue;
+extern volatile uint8_t armed;
+extern volatile float throttle;
 
 #endif /* APP_GLOBALS_H */
 //

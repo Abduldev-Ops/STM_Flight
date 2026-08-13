@@ -59,6 +59,9 @@ void task_display(void *argument)
                 snprintf(buf, sizeof(buf), "GPS: No Fix");
             ssd1306_WriteString(buf, Font_7x10, White);
 
+            ssd1306_SetCursor(90, 48);
+            ssd1306_WriteString(armed ? "ARM" : "DIS", Font_6x8, White);
+
             ssd1306_UpdateScreen();
             osMutexRelease(i2c_mutex);
         }
