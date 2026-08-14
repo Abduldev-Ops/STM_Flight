@@ -31,20 +31,25 @@ void task_control(void *argument)
 	const float dt= 0.01f;
 	//const float THROTTLE = 50.0f;
 	FlightState_t state;
-
+	RCInput_t rc = {0};
 
 	for (;;){
+		osMessageQueueGet(rc_queue, &rc, NULL, 0);
 		if (osMessageQueueGet(control_state_queue, &state, NULL, osWaitForever) == osOK)
 		{
 			float gyro_x_corrected = state.gyro_x - state.bias_x;
 			float gyro_y_corrected = state.gyro_y - state.bias_y;
 
-			float roll_rate_setpoint = PID_Update(&pid_roll_angle, 0, state.roll, dt);
-			float pitch_rate_setpoint = PID_Update(&pid_pitch_angle, 0, state.pitch, dt);
+			float desired_roll = rc.roll;
+			float desired_pitch = rc.pitch;
+			float desired_yaw = rc.yaw;
+
+			float roll_rate_setpoint = PID_Update(&pid_roll_angle, desired_roll, state.roll, dt);
+			float pitch_rate_setpoint = PID_Update(&pid_pitch_angle, desired_pitch, state.pitch, dt);
 
 			float roll_out = PID_Update(&pid_rollrate, roll_rate_setpoint, gyro_x_corrected, dt);
 			float pitch_out = PID_Update(&pid_pitchrate, pitch_rate_setpoint, gyro_y_corrected, dt);
-			float yaw_out = PID_Update(&pid_yawrate, 0, state.gyro_z, dt);
+			float yaw_out = PID_Update(&pid_yawrate, desired_yaw, state.gyro_z, dt);
 
 
 			float base = armed ? throttle : 0.0f;

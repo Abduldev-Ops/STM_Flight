@@ -34,7 +34,15 @@ void task_log(void *argument)
 
         if (hold_ms >=  ARM_HOLD_MS)
         {
-        	if (throttle > 5.0f)
+        	//only allow arming if rc linkis unactve
+        	uint32_t link_age = osKernelGetTickCount() - rc_last_packet_ms;
+        	if (rc_last_packet_ms > 0 && link_age < 1000)
+        	{
+        		osMutexAcquire(uart_mutex, osWaitForever);
+        		printf("[ARM] Use controller to arm - RC link active\r\n");
+        		osMutexRelease(uart_mutex);
+        	}
+        	else if (throttle > 5.0f)
         	{
         		osMutexAcquire(uart_mutex, osWaitForever);
         		printf("[ARM] REFUSED — throttle not zero\r\n");

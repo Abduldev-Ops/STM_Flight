@@ -26,6 +26,8 @@ extern osMessageQueueId_t baro_queue;
 extern osMessageQueueId_t gps_queue;
 extern volatile uint8_t armed;
 extern volatile float throttle;
+extern osMessageQueueId_t rc_queue;
+extern volatile uint32_t rc_last_packet_ms;
 
 #endif /* APP_GLOBALS_H */
 //

@@ -76,6 +76,14 @@ typedef struct{
 	uint8_t satellites;
 	uint8_t valid;
 } GPSData_t;
+
+typedef struct {
+	float throttle;
+	float roll;
+	float pitch;
+	float yaw;
+	uint8_t armed;
+} RCInput_t;
 #endif /* APP_TYPES_H */
 //
 //#endif /* INC_APP_TYPES_H_ */

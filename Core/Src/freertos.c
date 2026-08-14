@@ -37,6 +37,8 @@
 #include "task_baro.h"
 #include "task_control.h"
 #include "task_gps.h"
+#include "task_rc.h"
+
 void task_sensor(void *argument);
 //void task_print(void *argument);
 void task_display(void *argument);
@@ -46,6 +48,7 @@ void task_filter(void *argument);
 void task_gps(void *argument);
 void task_control(void *argument);
 void task_baro(void *argument);
+void task_rc(void *argument);
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,11 +74,13 @@ osMessageQueueId_t imu_queue;
 osMessageQueueId_t state_queue;
 osMessageQueueId_t control_state_queue;
 osSemaphoreId_t button_sem;
-volatile uint8_t logging_enabled;
+volatile uint8_t logging_enabled = 1;
 osMessageQueueId_t baro_queue;
 osMessageQueueId_t gps_queue;
 volatile uint8_t armed = 0;
 volatile float throttle = 0.0f;
+osMessageQueueId_t rc_queue;
+volatile uint32_t rc_last_packet_ms = 0;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -142,6 +147,12 @@ const osThreadAttr_t gps_task_attributes = {
     .stack_size = 512 * 4,
     .priority = (osPriority_t) osPriorityNormal,
 };
+
+const osThreadAttr_t rc_task_attributes = {
+    .name = "rc",
+    .stack_size = 256 * 4,
+    .priority = (osPriority_t) osPriorityAboveNormal,
+};
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -180,6 +191,7 @@ void MX_FREERTOS_Init(void) {
 	control_state_queue = osMessageQueueNew(10, sizeof(FlightState_t), NULL);
 	baro_queue = osMessageQueueNew(5, sizeof(BarData_t), NULL);
 	gps_queue = osMessageQueueNew(5, sizeof(GPSData_t), NULL);
+	rc_queue = osMessageQueueNew(5, sizeof(RCInput_t), NULL);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -198,6 +210,7 @@ void MX_FREERTOS_Init(void) {
   osThreadNew(task_baro, NULL, &baro_task_attributes);
   osThreadNew(task_control, NULL, &control_task_attributes);
   osThreadNew(task_gps, NULL, &gps_task_attributes);
+  osThreadNew(task_rc, NULL, &rc_task_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */

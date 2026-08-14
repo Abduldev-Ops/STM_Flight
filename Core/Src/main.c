@@ -42,6 +42,7 @@
 #include "task_control.h"
 #include "task_gps.h"
 #include "task_baro.h"
+#include "task_rc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -79,6 +80,7 @@ void task_filter(void *argument);
 void task_baro(void *argument);
 void task_gps(void *argument);
 void task_control(void *argument);
+void task_rc(void *argument);
 //void task_blink_fast(void *argument);
 //void task_blink_slow(void *argument);
 /* USER CODE END PFP */
@@ -128,6 +130,7 @@ int main(void)
   MX_I2C1_Init();
   MX_IWDG_Init();
   MX_USART1_UART_Init();
+  MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
   printf("Booting...\r\n");
   /* USER CODE END 2 */
