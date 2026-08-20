@@ -22,10 +22,10 @@ typedef struct {
     int16_t gyro_z;
 } IMUData_t;
 
-typedef struct {
-    float roll;
-    float pitch;
-} Attitude_t;
+//typedef struct {
+//    float roll;
+//    float pitch;
+//} Attitude_t;
 
 typedef struct {
 	float altitude;
@@ -84,6 +84,21 @@ typedef struct {
 	float yaw;
 	uint8_t armed;
 } RCInput_t;
+
+typedef struct __attribute__((packed)){
+	uint8_t start;
+	float roll;
+	float pitch;
+	float altitude;
+	float latitude;
+	float longitude;
+	float throttle;
+	float m1, m2, m3, m4;
+	uint8_t armed;
+	uint8_t gps_fix;
+	uint8_t satellites;
+	uint8_t checksum;
+} TelemetryPckt_t;
 #endif /* APP_TYPES_H */
 //
 //#endif /* INC_APP_TYPES_H_ */

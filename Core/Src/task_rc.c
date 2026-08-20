@@ -139,17 +139,6 @@ void task_rc(void *argument)
 	            failsafe_active = 0;
 
 	            osMessageQueuePut(rc_queue, &rc, 0, 0);
-
-	            static uint32_t last_debug = 0;
-	            uint32_t now = osKernelGetTickCount();
-	            if (now - last_debug > 1000)
-	            {
-	                last_debug = now;
-	                osMutexAcquire(uart_mutex, osWaitForever);
-	                printf("[RC] age:%lu ready:%d\r\n",
-	                       now - rc_last_packet_ms, rc_packet_ready);
-	                osMutexRelease(uart_mutex);
-	            }
 	        }
 	    }
 	    osDelay(5);

@@ -11,12 +11,27 @@
 #include "cmsis_os.h"
 #include "flight/pid.h"
 #include "stdio.h"
+#include "flight/dshot.h"
+
+#define TELE_PACKET_START 0XCD
 
 PID_t pid_rollrate;
 PID_t pid_pitchrate;
 PID_t pid_yawrate;
 PID_t pid_roll_angle;
 PID_t pid_pitch_angle;
+
+TelemetryPckt_t tele;
+
+static uint8_t calcCheckSum(TelemetryPckt_t *tele)
+{
+	uint8_t *bytes = (uint8_t *) tele;
+	uint8_t chk = 0;
+	for (int i = 1; i < sizeof(TelemetryPckt_t) - 1; i++)
+		chk ^= bytes[i];
+	return chk;
+}
+
 
 void task_control(void *argument)
 {
@@ -32,6 +47,8 @@ void task_control(void *argument)
 	//const float THROTTLE = 50.0f;
 	FlightState_t state;
 	RCInput_t rc = {0};
+	BarData_t baro = {0};
+	GPSData_t gps = {0};
 
 	for (;;){
 		osMessageQueueGet(rc_queue, &rc, NULL, 0);
@@ -75,6 +92,40 @@ void task_control(void *argument)
 				if (m4 < 0.0f) m4 = 0.0f;
 				if (m4 > 100.0f) m4 = 100.0f;
 			}
+
+			DSHOT_SendMotors(m1, m2, m3, m4, armed);
+
+			if (logging_enabled)
+			{
+			    osMutexAcquire(uart_mutex, osWaitForever);
+			    printf("[DSHOT] CH1: ");
+			    for (int i = 0; i < 16; i++)
+			        printf("%lu ", dshot_buf_ch1[i]);
+			    printf("\r\n");
+			    osMutexRelease(uart_mutex);
+			}
+
+			osMessageQueueGet(gps_queue, &gps, NULL, 0);
+			osMessageQueueGet(baro_queue, &baro, NULL, 0);
+
+			tele.start = TELE_PACKET_START;
+			tele.roll = state.roll;
+			tele.pitch = state.pitch;
+			tele.altitude = baro.altitude;
+			tele.latitude = gps.latitude;
+			tele.longitude = gps.longitude;
+			tele.throttle = throttle;
+			tele.m1 = m1;
+			tele.m2 = m2;
+			tele.m3 = m3;
+			tele.m4 = m4;
+			tele.armed = armed;
+			tele.gps_fix = gps.fix;
+			tele.satellites = gps.satellites;
+			tele.checksum = calcCheckSum(&tele);
+
+			osMessageQueuePut(telemetry_queue, &tele, 0, 0);
+
 			if (logging_enabled){
 				osMutexAcquire(uart_mutex, osWaitForever);
 				printf("[%s] T:%.0f RS:%.1f PS:%.1f M1:%.0f M2:%.0f M3:%.0f M4:%.0f\r\n", armed ? "ARM" : "DIS", throttle,

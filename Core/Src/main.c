@@ -19,9 +19,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "dma.h"
 #include "i2c.h"
 #include "iwdg.h"
 #include "usart.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -43,6 +45,7 @@
 #include "task_gps.h"
 #include "task_baro.h"
 #include "task_rc.h"
+#include "task_telemetry.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -81,6 +84,7 @@ void task_baro(void *argument);
 void task_gps(void *argument);
 void task_control(void *argument);
 void task_rc(void *argument);
+void task_telemetry(void *argument);
 //void task_blink_fast(void *argument);
 //void task_blink_slow(void *argument);
 /* USER CODE END PFP */
@@ -126,13 +130,19 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_LPUART1_UART_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   printf("Booting...\r\n");
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
   /* USER CODE END 2 */
 
   /* Init scheduler */
