@@ -95,16 +95,6 @@ void task_control(void *argument)
 
 			DSHOT_SendMotors(m1, m2, m3, m4, armed);
 
-			if (logging_enabled)
-			{
-			    osMutexAcquire(uart_mutex, osWaitForever);
-			    printf("[DSHOT] CH1: ");
-			    for (int i = 0; i < 16; i++)
-			        printf("%lu ", dshot_buf_ch1[i]);
-			    printf("\r\n");
-			    osMutexRelease(uart_mutex);
-			}
-
 			osMessageQueueGet(gps_queue, &gps, NULL, 0);
 			osMessageQueueGet(baro_queue, &baro, NULL, 0);
 
