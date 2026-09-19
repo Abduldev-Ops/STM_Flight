@@ -7,7 +7,7 @@
 #include <WiFiUdp.h>
 
 const char* ssid     = "WIFI-CE54";
-const char* password = "bored8240county";
+const char* password = "";
 
 const char* GS_IP   = "255.255.255.255";  // broadcast
 const int   GS_PORT = 5005;
