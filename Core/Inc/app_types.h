@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 typedef struct {
+	uint32_t timestamp;
     int16_t accel_x;
     int16_t accel_y;
     int16_t accel_z;
@@ -58,6 +59,7 @@ typedef struct {
 	float gyro_z;
 	float bias_x;
 	float bias_y;
+	float dt;
 }FlightState_t;
 
 typedef struct {
@@ -99,6 +101,13 @@ typedef struct __attribute__((packed)){
 	uint8_t satellites;
 	uint8_t checksum;
 } TelemetryPckt_t;
+
+typedef struct {
+	uint8_t armed;
+	float thr, roll, pitch;
+	float rs, ps;
+	float m1, m2, m3, m4;
+} CtrlLog_t;
 #endif /* APP_TYPES_H */
 //
 //#endif /* INC_APP_TYPES_H_ */

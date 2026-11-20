@@ -192,6 +192,18 @@ void ssd1306_UpdateScreen(void) {
     }
 }
 
+/* STM_Flight addition: write ONE page so the caller can release the I2C
+ * bus between pages. Identical to one iteration of ssd1306_UpdateScreen().
+ * At 400 kHz a page (~135 bytes) holds the bus ~3 ms, under the 10 ms IMU period. */
+void ssd1306_UpdatePage(uint8_t page)
+{
+    if (page >= SSD1306_HEIGHT / 8) return;
+    ssd1306_WriteCommand(0xB0 + page);
+    ssd1306_WriteCommand(0x00 + SSD1306_X_OFFSET_LOWER);
+    ssd1306_WriteCommand(0x10 + SSD1306_X_OFFSET_UPPER);
+    ssd1306_WriteData(&SSD1306_Buffer[SSD1306_WIDTH * page], SSD1306_WIDTH);
+}
+
 /*
  * Draw one pixel in the screenbuffer
  * X => X Coordinate

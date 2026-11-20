@@ -1,7 +1,7 @@
 #ifndef __SSD1306_CONF_H__
 #define __SSD1306_CONF_H__
 
-#include "stm32l4xx_hal.h"
+#include "stm32f4xx_hal.h"
 
 // Display size
 #define SSD1306_128_64

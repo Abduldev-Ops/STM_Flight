@@ -8,7 +8,7 @@
 #ifndef DRIVERS_BMP280_H
 #define DRIVERS_BMP280_H
 
-#include "stm32l4xx_hal.h"
+#include "stm32f4xx_hal.h"
 #include "app_types.h"
 
 #define BMP280_ADDR (0X76 << 1)

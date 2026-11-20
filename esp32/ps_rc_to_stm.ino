@@ -6,8 +6,7 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
-const char* ssid     = "WIFI-CE54";
-const char* password = "";
+#include "secrets.h"
 
 const char* GS_IP   = "255.255.255.255";  // broadcast
 const int   GS_PORT = 5005;
@@ -97,7 +96,7 @@ void setup() {
   BP32.setup(&onConnectGameP, &onDisconnectGameP);
   BP32.forgetBluetoothKeys();
   Serial.println("Waiting for controller");
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wifi");
   while (WiFi.status() != WL_CONNECTED){
     delay(500);

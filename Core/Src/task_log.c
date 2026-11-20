@@ -25,7 +25,7 @@ void task_log(void *argument)
         osSemaphoreAcquire(button_sem, osWaitForever);
 
         uint32_t hold_start = osKernelGetTickCount();
-        while (HAL_GPIO_ReadPin(B1_button_GPIO_Port, B1_button_Pin) == GPIO_PIN_RESET)
+        while (HAL_GPIO_ReadPin(B1_Button_GPIO_Port, B1_Button_Pin) == GPIO_PIN_RESET)
         {
         	osDelay(10);
         }

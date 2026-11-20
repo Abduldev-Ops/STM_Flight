@@ -13,14 +13,11 @@
 #include "cmsis_os.h"
 #include <string.h>
 #include <stdio.h>
+#include  "task_rc.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 
 #define GPS_BUF_Size 128
-
-extern uint8_t rcrx_byte;
-extern uint8_t rc_buf[];
-extern uint8_t rc_idx;
-extern uint8_t rc_synced;
-extern volatile uint8_t rc_packet_ready;
 
 static char gps_line[GPS_BUF_Size];
 static uint8_t gps_rx_byte;
@@ -30,7 +27,7 @@ volatile uint32_t rc_byte_count = 0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if (huart->Instance == USART1)
+	if (huart->Instance == USART2)
 	{
 		gps_byte_count++;
 		char c = (char)gps_rx_byte;
@@ -45,27 +42,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		}
 
 	    	// Re-arm interrupt for next byte
-		HAL_UART_Receive_IT(&huart1, &gps_rx_byte, 1);
-	} else if (huart->Instance == LPUART1)
-	{
-		HAL_UART_RxCpltCallback_RC(huart);
+		HAL_UART_Receive_IT(&huart2, &gps_rx_byte, 1);
 	}
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART1)
+    if (huart->Instance == USART2)
     {
     	__HAL_UART_CLEAR_OREFLAG(huart);          // clear the overrun flag
-    	HAL_UART_Receive_IT(&huart1, &gps_rx_byte, 1);  // re-arm reception
-    } else if (huart->Instance == LPUART1)
-    {
-    	__HAL_UART_CLEAR_PEFLAG(huart);
-    	__HAL_UART_CLEAR_FEFLAG(huart);
-    	__HAL_UART_CLEAR_NEFLAG(huart);
-        __HAL_UART_CLEAR_OREFLAG(huart);
-        extern uint8_t rcrx_byte;
-        HAL_UART_Receive_IT(&hlpuart1, &rcrx_byte, 1);
+    	HAL_UART_Receive_IT(&huart2, &gps_rx_byte, 1);  // re-arm reception
     }
 }
 
@@ -79,9 +65,9 @@ void task_gps(void *argument)
 	osMutexRelease(uart_mutex);
 
 //	osMutexAcquire(uart_mutex, osWaitForever);
-//	printf("[GPS] ErrorCode: 0x%lX  RxState: %ld\r\n", huart1.ErrorCode, huart1.RxState);
+//	printf("[GPS] ErrorCode: 0x%lX  RxState: %ld\r\n", huart2.ErrorCode, huart2.RxState);
 //	osMutexRelease(uart_mutex);
-	HAL_UART_Receive_IT(&huart1, &gps_rx_byte, 1);
+	HAL_UART_Receive_IT(&huart2, &gps_rx_byte, 1);
 
 	GPSData_t gps = {0};
     char local_line[GPS_BUF_Size];
@@ -99,7 +85,7 @@ void task_gps(void *argument)
 
                if (GPS_ParseGGA(local_line, &gps) == 1)
                {
-                   osMessageQueuePut(gps_queue, &gps, 0, 0);
+            	   xQueueOverwrite((QueueHandle_t)gps_queue, &gps);
 
                    if (logging_enabled)
                    {

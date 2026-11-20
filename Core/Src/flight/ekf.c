@@ -145,3 +145,9 @@ void EKF_Update(EKF_t *ekf, float roll_meas, float pitch_meas)
     ekf->P[2][0]=P20; ekf->P[2][1]=P21; ekf->P[2][2]=P22; ekf->P[2][3]=P23;
     ekf->P[3][0]=P30; ekf->P[3][1]=P31; ekf->P[3][2]=P32; ekf->P[3][3]=P33;
 }
+
+void EKF_SetMeasNoise(EKF_t *ekf, float r)
+{
+	ekf->R[0][0] = r;
+	ekf->R[1][1] = r;
+}

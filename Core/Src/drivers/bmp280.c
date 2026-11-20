@@ -12,13 +12,20 @@
 // average sea level on day of writing Aug 8: 12am-10am using https://winnipeg.weatherstats.ca/charts/pressure_sea-hourly.html
 #define SEA_LEVEL_PA 101421.0f
 
+#define BMP280_REG_CONFIG  0xF5   /* standby time + IIR filter */
+
+static HAL_StatusTypeDef bmp_write(I2C_HandleTypeDef *hi2c, uint8_t reg, uint8_t val)
+{
+    return HAL_I2C_Mem_Write(hi2c, BMP280_ADDR, reg, I2C_MEMADD_SIZE_8BIT, &val, 1, 100);
+}
+
 HAL_StatusTypeDef BMP280_Init(I2C_HandleTypeDef *hi2c, BMP280Calib_t *calib)
 {
 	uint8_t calib_raw[24];
 	HAL_StatusTypeDef status;
 
 	//read 24 bytes calib data at x88
-	status = HAL_I2C_Mem_Read(hi2c, BMP280_ADDR, BMP280_REG_CALIB, I2C_MEMADD_SIZE_8BIT, calib_raw, 24, HAL_MAX_DELAY);
+	status = HAL_I2C_Mem_Read(hi2c, BMP280_ADDR, BMP280_REG_CALIB, I2C_MEMADD_SIZE_8BIT, calib_raw, 24, 100);
 
 	if (status != HAL_OK) return status;
 
@@ -37,9 +44,15 @@ HAL_StatusTypeDef BMP280_Init(I2C_HandleTypeDef *hi2c, BMP280Calib_t *calib)
 	calib->dig_P9 = (int16_t) (calib_raw[23] << 8 | calib_raw[22]);
 
 	//set oversampling
-	uint8_t ctrl = 0x27;  // osrs_t=001, osrs_p=001, mode=11
-	status = HAL_I2C_Mem_Write(hi2c, BMP280_ADDR, BMP280_REG_CTRL, I2C_MEMADD_SIZE_8BIT, &ctrl, 1, HAL_MAX_DELAY);
-	return status;
+	/* 1. Sleep first: config (0xF5) writes can be ignored in normal mode, and the
+	 *    sensor keeps running across an STM32 reset because it stays powered. */
+	if ((status = bmp_write(hi2c, BMP280_REG_CTRL, 0x00)) != HAL_OK) return status;
+
+	/* 2. IIR filter coefficient 16, 0.5 ms standby */
+	if ((status = bmp_write(hi2c, BMP280_REG_CONFIG, 0x10)) != HAL_OK) return status;
+
+	/* 3. Temperature x2, pressure x16, normal mode (~26 conversions/s internally) */
+	return bmp_write(hi2c, BMP280_REG_CTRL, 0x57);
 }
 
 HAL_StatusTypeDef BMP280_Read(I2C_HandleTypeDef *hi2c, BMP280Calib_t *calib, BarData_t *out)
@@ -49,7 +62,7 @@ HAL_StatusTypeDef BMP280_Read(I2C_HandleTypeDef *hi2c, BMP280Calib_t *calib, Bar
 
     // Read 6 bytes: press_msb, press_lsb, press_xlsb, temp_msb, temp_lsb, temp_xlsb
     status = HAL_I2C_Mem_Read(hi2c, BMP280_ADDR, BMP280_REG_DATA,
-                               I2C_MEMADD_SIZE_8BIT, raw, 6, HAL_MAX_DELAY);
+                               I2C_MEMADD_SIZE_8BIT, raw, 6, 100);
     if (status != HAL_OK) return status;
 
     int32_t adc_P = (int32_t)((raw[0] << 12) | (raw[1] << 4) | (raw[2] >> 4));

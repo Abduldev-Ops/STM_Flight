@@ -29,6 +29,7 @@ extern volatile float throttle;
 extern osMessageQueueId_t rc_queue;
 extern volatile uint32_t rc_last_packet_ms;
 extern osMessageQueueId_t telemetry_queue;
+extern osMessageQueueId_t log_queue;
 
 #endif /* APP_GLOBALS_H */
 //

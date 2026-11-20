@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32l4xx_hal.h"
+#include "stm32f4xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -57,25 +57,11 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define B1_button_Pin GPIO_PIN_13
-#define B1_button_GPIO_Port GPIOC
-#define B1_button_EXTI_IRQn EXTI15_10_IRQn
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_3
-#define USART_RX_GPIO_Port GPIOA
-#define LD4_Pin GPIO_PIN_5
-#define LD4_GPIO_Port GPIOA
-#define USART1_TX_Pin GPIO_PIN_9
-#define USART1_TX_GPIO_Port GPIOA
-#define USART1_RX_Pin GPIO_PIN_10
-#define USART1_RX_GPIO_Port GPIOA
-#define TMS_Pin GPIO_PIN_13
-#define TMS_GPIO_Port GPIOA
-#define TCK_Pin GPIO_PIN_14
-#define TCK_GPIO_Port GPIOA
-#define SWO_Pin GPIO_PIN_3
-#define SWO_GPIO_Port GPIOB
+#define B1_Button_Pin GPIO_PIN_0
+#define B1_Button_GPIO_Port GPIOA
+#define B1_Button_EXTI_IRQn EXTI0_IRQn
+#define Buzzer_Pin GPIO_PIN_6
+#define Buzzer_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

@@ -11,7 +11,7 @@
 #ifndef DRIVERS_MPU6050_H
 #define DRIVERS_MPU6050_H
 
-#include "stm32l4xx_hal.h"
+#include "stm32f4xx_hal.h"
 #include "app_types.h"
 
 #define MPU6050_ADDR        (0x68 << 1)

@@ -19,4 +19,5 @@ typedef struct{
 void  EKF_Init(EKF_t *ekf);
 void EKF_Predict(EKF_t *ekf, float gx, float gy, float dt);
 void EKF_Update(EKF_t *ekf, float roll_meas, float pitch_meas);
+void EKF_SetMeasNoise(EKF_t *ekf, float r);
 #endif /* INC_FLIGHT_EKF_H_ */
