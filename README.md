@@ -6,8 +6,8 @@ sensor drivers to the motor output, is written in C.
 
 <!-- Add a photo of the drone here: ![Drone](docs/drone.jpg) -->
 
-**Demo video:** [add link]
-**Status:** [e.g. "Bench-tested with props on a tether; flight controller board being rebuilt after a power fault"]
+<!--**Demo video:** --> 
+**Status:** Bench-tested with props on a tether; flight controller being rebuilt after a power fault.
 
 > Originally developed on a Nucleo-L452RE (see tag [`l452-nucleo`](../../tree/l452-nucleo)),
 > then ported to the STM32F405 for its 168 MHz timers and extra DMA headroom.
